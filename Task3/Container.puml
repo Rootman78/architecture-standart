@@ -1,0 +1,54 @@
+@startuml
+title Система открытия депозитов диаграмма контейнеров
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user_new, "Новый клиент", "Клиент который впервые хочет открыть депозит в нашем банек")
+Person(user_old, "Клиент банка", "Клиент банка имеющий доступ к интернет банку")
+System(DepozitSystem, "Система открытия депозитов", "Система открывает депозиты с использованием заявок на сайте, интернет-банка, кол-центра, посещения банка")
+
+Container_Boundary(DepozitSystem, "Depozit System") {
+  Container(WebApp, "Сайт", "React.js, PHP", "Позволяет подавать заявку на открытие депозита")
+  Container(InternatBank, "Интернет-банк", "ASP.NET MVC 4.5", "Позволяте оформить депозит клиенту банка")
+  Container(OwnCallCentre, "Система кол-центра", "Node.js", "Принимает заявки клиентов")
+  ContainerDb(InternatBankDB, "База данных интернет-банка", "MSSQL", "Хранит данные интернет банка")
+  ContainerDb(OwnCallCentreDB, "База данных кол-центра", "PostgreSQL", "Хранит данные кол-центра")
+  Container(ABC, "АБС", "Delphi", "Расчитывает и обрабатывает ставки по депозитам")
+  ContainerDb(ABCDB, "База данных АБС", "Oracle", "Хранит данные АБС")
+  Container(SMSGate, "СМС-шлюз телеком-оператора", "Apache Kafka", "Отправляет СМС сообщения")
+  Person(user_back, "Сотрубник бэк-офис", "Выполняет расчет ставок депозита")
+  Person(user_credit, "Сотрубник кредитного отдела", "Выполныяет расчет кредитного рейтинга и базовой ставки депозита")
+  Person(user_call, "Сотрудник кол-центра", "Принимает звонки и связывается с клиентами")
+  Container(BankOffice, "Офис банка", "АБС", "Идентификация клиента, открытие депозита")
+
+}
+
+System_Ext(PartnerCallCenter, "Внешний  кол-центр", "Система партнёрского кол-центр")
+System_Ext(TelecomGate, "Телеком-оператор", "Внешний оператор по отправке СМС")
+
+Rel(user_new, WebApp, "Подать заявку")
+Rel(user_old, WebApp,"Подать заявку")
+Rel(user_old, InternatBank,"Открыть депозит")
+Rel(InternatBank, InternatBankDB, "Читает/записывает данные")
+Rel(OwnCallCentre, OwnCallCentreDB, "Читает/записывает данные")
+Rel(WebApp,OwnCallCentre,"Перадача заявки")
+Rel(user_call,OwnCallCentre,"Работает с системой кол-центра")
+Rel(user_call,user_new,"Сязывается и предлагает особые условия")
+Rel(user_call,user_old,"Сязывается и предлагает особые условия")
+Rel(ABC, ABCDB, "Читает/записывает данные")
+Rel(user_new, OwnCallCentre, "Связаться по телефону")
+Rel(OwnCallCentre, PartnerCallCenter, "Перенаправление звонков")
+Rel(user_old,OwnCallCentre,"Связаться по телефону")
+Rel(ABC,SMSGate,"Отправка текста СМС сообщений")
+Rel(SMSGate,TelecomGate,"Отправка текста СМС сообщений")
+Rel(user_back,ABC,"Работает с ABC")
+Rel(user_credit,ABC,"Работает с ABC")
+Rel(InternatBank, ABC,"Зпарашивает расчет ставок")
+Rel(OwnCallCentre, ABC,"Зпарашивает расчет ставок")
+Rel(user_old, BankOffice,"Открыть депозит")
+Rel(user_new, BankOffice,"Идентификация, открытие депозит")
+Rel(BankOffice, ABC,"Получение актуальных ставок")
+
+@enduml
