@@ -7,33 +7,32 @@ top to bottom direction
 
 Person(user_new, "Новый клиент", "Клиент который впервые хочет открыть депозит в нашем банек")
 Person(user_old, "Клиент банка", "Клиент банка имеющий доступ к интернет банку")
-System(CallCenterSystem, "Система обработки звонков в нашем кол-центре", "Система обработки звонков в собственном кол-центре")
+System(CallCenterSystem, "Кол-центр банка")
 Person(ext_user_call, "Сотрудник внешнего кол-центра", "Обрабатывает заявки банка")
 
 Container_Boundary(CallCenterSystem, "CallCenter System") {
   Container(OwnCallCentre, "Система кол-центра", "Node.js", "Принимает заявки клиентов")
   ContainerDb(OwnCallCentreDB, "База данных кол-центра", "PostgreSQL", "Хранит данные кол-центра")
+  Person(user_call, "Сотрудник кол-центра", "Принимает звонки и связывается с клиентами")
+
+}
+
   Container(ABC, "АБС", "Delphi", "Расчитывает и обрабатывает ставки по депозитам")
   ContainerDb(ABCDB, "База данных АБС", "Oracle", "Хранит данные АБС")
   Person(user_back, "Сотрубник бэк-офис", "Выполняет расчет ставок депозита")
-  Person(user_call, "Сотрудник кол-центра", "Принимает звонки и связывается с клиентами")
-
-
-
-}
 
 System_Ext(PartnerCallCenter, "Внешний  кол-центр", "Система партнёрского кол-центр")
 
 
 Rel(user_new, OwnCallCentre, "Звонит")
 Rel(user_old, OwnCallCentre,"Звонит")
-Rel(OwnCallCentre, OwnCallCentreDB, "Читает/записывает данные")
+Rel(OwnCallCentre, OwnCallCentreDB, "Читает/записывает данные \n [TCP/IP, SSL]")
 Rel(user_call,OwnCallCentre,"Отвечает на звонок клиента")
-Rel(ABC, ABCDB, "Читает/записывает данные")
-Rel(OwnCallCentre, PartnerCallCenter, "Перенаправление звонков")
-Rel(PartnerCallCenter,OwnCallCentre , "Загружает файл с информацией по ставкам")
+Rel(ABC, ABCDB, "Читает/записывает данные \n [TCP/IP, SSL]")
+Rel(OwnCallCentre, PartnerCallCenter, "Перенаправление звонков \n [SIP]")
+Rel(PartnerCallCenter,OwnCallCentre , "Загружает файл с информацией по ставкам \n [FTP, csv файл]")
 Rel(user_back,ABC,"Работает с ABC")
-Rel(ABC, OwnCallCentre ,"Отправляет расчет актуальных ставок в виде файла")
+Rel(ABC, OwnCallCentre ,"Отправляет расчет актуальных ставок в виде файла \n [FTP, csv файл]")
 Rel(ext_user_call, PartnerCallCenter, "Рабатет в партнерскуом кол-центре")
 
 
