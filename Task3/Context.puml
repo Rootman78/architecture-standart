@@ -1,0 +1,21 @@
+@startuml
+title Система открытия депозитов диаграмма контекста
+
+top to bottom direction
+
+!includeurl https://raw.githubusercontent.com/RicardoNiepel/C4-PlantUML/master/C4_Component.puml
+
+Person(user_new, "Новый клиент", "Клиент который впервые хочет открыть депозит в нашем банек")
+Person(user_old, "Клиент банка", "Клиент банка имеющий доступ к интернет банку")
+
+System(DepozitSystem, "Система открытия депозитов", "Система открывает депозиты с использованием заявок на сайте, интернет-банка, кол-центра, посещения банка")
+
+System_Ext(CallCenter, "Внешний  кол-центр", "Система партнёрского кол-центр")
+System_Ext(TelecomGate, "Телеком-оператор", "Внешний оператор по отправке СМС")
+
+Rel(user_new, DepozitSystem, "Подключается к системе")
+Rel(user_old, DepozitSystem, "Подключается к системе")
+Rel(DepozitSystem,CallCenter,"Подключаем партнерский кол-центр для обработки заявок")
+Rel(DepozitSystem,TelecomGate,"Отправляем СМС")
+
+@enduml
